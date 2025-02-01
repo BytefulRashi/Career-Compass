@@ -137,14 +137,6 @@ categories = {
 nav_options = list(categories.keys()) + ["Chat with Career Advisor"]
 selected_category = st.sidebar.selectbox("Select a category:", nav_options)
 
-if selected_category != "Chat with Career Advisor":
-    st.chat_message("assistant").write("What do you want to become?")
-    career_goal = st.chat_input("Enter your career goal here...", key="career_goal_input_1")
-    if career_goal:
-        st.session_state["topic"] = career_goal
-        st.chat_message("user").write(career_goal)
-        st.write(f"Your career goal: {career_goal}")
-
 # Process only if both career goal and resume are present
 if uploaded_resume and st.session_state.get("topic") and not st.session_state["processing_done"]:
     try:
