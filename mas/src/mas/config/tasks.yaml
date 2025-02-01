@@ -1,0 +1,243 @@
+market_analysis_task:
+  description: >
+    Conduct a comprehensive and data-driven analysis of the current job market trends, 
+    emerging industries, and in-demand skills using extensive web research and quantitative data
+    taking user's query {topic} into the context. 
+    The analysis should include:
+    - Detailed industry growth projections
+    - Precise salary range insights
+    - Specific skill demand metrics
+    - Comprehensive employment trend analysis
+    - Regional and global market perspectives
+  
+  research_parameters:
+    data_sources:
+      - Bureau of Labor Statistics
+      - LinkedIn Job Market Reports
+      - Industry-specific economic forecasts
+      - Professional association trend reports
+    
+  quantitative_focus:
+    - Job growth rates (CAGR%)
+    - Median salary ranges
+    - Skill penetration percentages
+    - Employment demand indicators
+    - Investment and funding trends
+
+  emerging_industries_criteria:
+    - Minimum job growth rate: 15% (next 5 years)
+    - Technology adoption index
+    - Investment capital influx
+    - Global market potential
+
+  skill_analysis:
+    - Skill obsolescence rates
+    - Emerging technology impact
+    - Cross-industry transferability
+    - Training and upskilling opportunities
+
+  expected_output: >
+    A comprehensive report delivering:
+    1. Top 5 industries with highest growth potential
+       - Projected job growth percentage
+       - Median salary ranges
+       - Key required skills
+    2. Skill demand landscape
+       - Top 10 most in-demand skills
+       - Skill market value
+       - Projected skill relevance (5-year outlook)
+    3. Comparative market analysis
+       - Regional employment trends
+       - Global market positioning
+    4. Actionable career development insights
+       - Recommended learning paths
+       - Potential career transition strategies
+
+  agent: market_analyst
+  output_file: "output/Market Analysis.md"
+
+profile_assessment_task:
+  description: >
+    Conduct a holistic, data-driven assessment of the user's professional profile {resume}, 
+    leveraging resume content to provide strategic career insights aligned with user's query {topic}.
+
+  input_constraints:
+    - Only uses provided resume
+    - Considers user's specific career query
+    - No external data sources beyond resume
+
+  assessment_dimensions:
+    - Professional competency mapping
+    - Career trajectory potential
+    - Skill-role alignment
+    - Growth opportunity identification
+
+  comprehensive_evaluation_framework:
+    professional_strengths_analysis:
+      - Technical skill proficiency
+      - Soft skill competencies
+      - Achievement quantification
+      - Unique value proposition
+
+    career_matching_criteria:
+      - Skills relevance percentage
+      - Role compatibility score
+      - Transferable skill identification
+      - Potential career pivot paths
+
+    improvement_strategy:
+      - Skill gap mapping
+      - Targeted learning recommendations
+      - Professional development roadmap
+      - Certification/upskilling suggestions
+
+  expected_output: >
+    Detailed assessment report including:
+    1. Professional profile synopsis
+    2. Strengths-weaknesses analysis
+    3. Tailored career match recommendations
+    4. Strategic skill enhancement plan
+    5. Actionable career development insights
+    6. Provide a short summary of the assessment using Summary Tool.
+
+  agent: profile_assessment
+  output_file: "output/Profile Assessment.md"
+
+skill_evaluation_task:
+  description: >
+    Execute a rigorous, quantitative evaluation of the user's skill ecosystem using user's resume {resume}, 
+    mapping current capabilities against the benchmarks of the industry user mentioned in the query {topic}.
+
+  input_constraints:
+    - Uses only provided resume
+    - Aligned with user's specific career query
+    - Use search tool only for the benchmarking task
+
+  skill_assessment_methodology:
+    - Skill proficiency grading
+    - Industry standard comparison
+    - Technological trend alignment
+    - Skill market value analysis
+
+  evaluation_parameters:
+    technical_skill_assessment:
+      - Skill depth evaluation
+      - Technology stack relevance
+      - Practical application rating
+      - Learning curve potential
+
+    soft_skill_evaluation:
+      - Communication effectiveness
+      - Leadership potential
+      - Collaboration capabilities
+      - Adaptability quotient
+
+    skill_gap_analysis:
+      - Identified skill deficiencies
+      - Emerging technology impacts
+      - Skill obsolescence risks
+      - Upskilling priority matrix
+
+  skill_matrix_components:
+    - Current skill proficiency levels
+    - Industry benchmark comparisons
+    - Skill market demand indicators
+    - Recommended development trajectories
+
+  expected_output: >
+    Comprehensive skill evaluation report:
+    1. Detailed skill proficiency matrix
+    2. Industry standard benchmarking
+    3. Skill gap identification
+    4. Targeted skill enhancement recommendations
+    5. Future-proofing skill strategy
+
+  agent: skill_evaluation
+  output_file: "output/Skill Evaluation.md"
+
+bias_detection_and_mitigation_task:
+  description: >
+    Generate bias-free, equitable outputs for all previous task analyses by 
+    systematically reviewing and neutralizing potential biases.
+
+  core_mitigation_process:
+    - Identify potential bias sources
+    - Neutralize discriminatory language
+    - Ensure inclusive recommendations
+    - Provide balanced, fair guidance
+
+  bias_free_principles:
+    - Demographic neutrality
+    - Equal opportunity representation
+    - Skill-based objective assessment
+    - Diverse career pathway exploration
+    - Context-sensitive recommendations
+
+  expected_output: >
+    Bias-free versions of:
+    1. Market Analysis Report
+    2. Profile Assessment Report
+    3. Skill Evaluation Report
+
+  context:
+    - market_analysis_task
+    - profile_assessment_task
+    - skill_evaluation_task
+
+  agent: bias_agent
+  output_file: "output/Bias Mitigated Responses.md"
+
+career_guidance_task:
+  description: >
+    Synthesize insights from comprehensive analysis to deliver a precise, 
+    personalized career guidance strategy aligned with user's profile {resume}, user's career 
+    related query {topic} and market dynamics using previous tasks outputs.
+
+  input_sources:
+    - User's resume
+    - User's career topic/query
+    - Outputs from previous task analyses
+
+  guidance_development_framework:
+    - Integrate market trends
+    - Align with personal skills
+    - Consider individual aspirations
+    - Evaluate skill-market compatibility
+
+  recommendation_criteria:
+    - Career path match percentage
+    - Skill transferability
+    - Growth potential
+    - Learning curve
+    - Market demand
+
+  recommendation_components:
+    for_each_career_option:
+      - Detailed role description
+      - Required skill progression
+      - Salary range projection
+      - Learning resources
+        - Online courses
+        - Certification paths
+        - Skill development videos
+      - Potential employers
+      - Career trajectory insights
+
+  expected_output: >
+    Comprehensive Career Guidance Report:
+    1. Top 3 personalized career recommendations
+    2. Detailed implementation roadmap
+    3. Skill development strategy
+    4. Resource links for each career path
+    5. Projected career growth insights
+
+  context: 
+    - market_analysis_task
+    - profile_assessment_task
+    - skill_evaluation_task
+    - bias_detection_and_mitigation_task
+
+  agent: career_guidance
+  output_file: "output/Career Guidance.md"
+
+
