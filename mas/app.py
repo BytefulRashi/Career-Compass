@@ -111,6 +111,7 @@ def upload_resume():
 
             # Process with Mas
             Mas().crew().kickoff(inputs=inputs)
+            upload_files_to_s3('processed_resumes', os.environ.get('BUCKET_NAME'))
             upload_files_to_s3('output', os.environ.get('BUCKET_NAME'))
             
             # Update session
