@@ -104,6 +104,13 @@ Career Compass serves diverse user needs:
 - **Career Counselors**: Augment their guidance with data-driven insights
 - **HR Professionals**: Support employee development and career planning
 
+## Prototype
+
+![image](https://github.com/user-attachments/assets/84f8236a-7d3a-4b2b-ac5a-8a3011598166)
+![image](https://github.com/user-attachments/assets/dbeae431-01a3-4abd-bba6-79062bafe3f4)
+![image](https://github.com/user-attachments/assets/1df08133-45d5-480d-91af-cd6238f35b8d)
+
+
 ## 🛣️ Roadmap
 
 Future enhancements planned:
@@ -132,14 +139,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🏆 Acknowledgments
 
 - Amdocs Gen AI Hackathon 2024-2025 organizers
-- Our mentors and advisors
 - The open-source community
-
-## 📞 Contact
-
-- Project Team - [your-email@example.com](mailto:your-email@example.com)
-- Project Link: [https://github.com/yourusername/career-compass](https://github.com/yourusername/career-compass)
-
----
 
 Developed with ❤️ for the Amdocs Gen AI Hackathon 2024-2025
