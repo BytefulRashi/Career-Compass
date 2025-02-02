@@ -136,6 +136,10 @@ We welcome contributions! Please follow these steps:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 📞 Contact
+
+- Project Team - [careercompass@example.com](mailto:your-email@example.com)
+
 ## 🏆 Acknowledgments
 
 - Amdocs Gen AI Hackathon 2024-2025 organizers
