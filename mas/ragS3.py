@@ -40,11 +40,11 @@ class RAGS3:
         documents = []
         for obj in objects.get('Contents', []):
             file_key = obj['Key']
-            if file_key.endswith('.txt'):
+            if file_key.endswith('.md'):
                 file_obj = s3.get_object(Bucket=self.bucket_name, Key=file_key)
                 file_content = file_obj['Body'].read().decode('utf-8')
-                # html_content = marko.convert(file_content)
-                documents.append(Document(page_content=file_content, metadata={"source": file_key}))
+                html_content = marko.convert(file_content)
+                documents.append(Document(page_content=html_content, metadata={"source": file_key}))
         self.documents = documents
         print("Loaded documents:", len(self.documents))
         return self.documents

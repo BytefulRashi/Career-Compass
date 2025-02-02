@@ -8,7 +8,7 @@ from src.mas.crew import Mas
 from src.mas.S3 import upload_files_to_s3
 from ragS3 import RAGS3
 import io
-import markdown
+# import markdown
 
 load_dotenv()
 

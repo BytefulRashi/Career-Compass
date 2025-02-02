@@ -68,15 +68,12 @@ document.getElementById("resumeForm").addEventListener("submit", function(e) {
     }
 });
 
-// Load Analysis Results
-// Previous code remains the same...
-
 function loadAnalysis() {
     const analysisTypes = [
-        { id: 'careerGuidance', title: 'Career Guidance', file: 'Career Guidance.txt' },
-        { id: 'skillEvaluation', title: 'Skill Evaluation', file: 'Skill Evaluation.txt' },
-        { id: 'profileAssessment', title: 'Profile Assessment', file: 'Profile Assessment.txt' },
-        { id: 'marketAnalysis', title: 'Market Analysis', file: 'Market Analysis.txt' }
+        { id: 'careerGuidance', title: 'Career Guidance', file: 'Career Guidance.md' },
+        { id: 'skillEvaluation', title: 'Skill Evaluation', file: 'Skill Evaluation.md' },
+        { id: 'profileAssessment', title: 'Profile Assessment', file: 'Profile Assessment.md' },
+        { id: 'marketAnalysis', title: 'Market Analysis', file: 'Market Analysis.md' }
     ];
 
     const analysisContent = document.getElementById("analysisContent");
@@ -120,24 +117,35 @@ function loadAnalysisContent(filename) {
 
     // Show loading state
     contentDiv.innerHTML = '<p class="loading">Loading analysis...</p>';
+    console.log('Loading analysis content for file:', filename);
 
-    fetch(`/outputs/${filename}`)
+    // S3 bucket public URL
+    const bucketName = "agent-system";  // Replace with your actual bucket name
+    const s3Region = "eu-north-1";  // Replace with your actual AWS region
+    const s3BaseUrl = `https://${bucketName}.s3.${s3Region}.amazonaws.com/outputs/`;
+
+    // Construct the full URL
+    const fileUrl = s3BaseUrl + encodeURIComponent(filename);
+    console.log('Constructed file URL:', fileUrl);
+
+    // Fetch the content from the file URL
+    fetch(fileUrl)
         .then(response => {
+            console.log('Response received for file:', filename, 'Status:', response.status);
             if (!response.ok) {
                 throw new Error('Analysis not available');
             }
             return response.text();
         })
         .then(content => {
-            // Create a pre element to preserve formatting
-            const preElement = document.createElement('pre');
-            preElement.className = 'analysis-text';
-            // Safely escape any HTML content and preserve whitespace
-            preElement.textContent = content;
-            
-            // Clear the content div and append the pre element
-            contentDiv.innerHTML = '';
-            contentDiv.appendChild(preElement);
+            console.log('Content fetched successfully for file:', filename);
+
+            // Use marked.js to convert markdown content to HTML
+            const htmlContent = marked.parse(content);
+
+            // Clear the content div and insert the HTML
+            contentDiv.innerHTML = htmlContent;
+            console.log('Markdown content displayed successfully in the analysis area.');
         })
         .catch(error => {
             console.error("Error loading analysis content:", error);
@@ -145,7 +153,6 @@ function loadAnalysisContent(filename) {
                 '<p class="message error">Analysis content not available. Please ensure your resume has been processed.</p>';
         });
 }
-// Rest of the code remains the same...
 
 // Chat functions remain unchanged
 function sendChat() {
@@ -173,10 +180,13 @@ function sendChat() {
     })
     .then(response => response.json())
     .then(data => {
+        // Convert the bot's markdown response to HTML using marked.js
+        const htmlResponse = marked.parse(data.answer);
+
         // Add bot message
         const botMessage = document.createElement("div");
         botMessage.className = "chat-message bot-message";
-        botMessage.innerHTML = `<strong>Career Advisor:</strong> ${data.answer}`;
+        botMessage.innerHTML = `<strong>Career Advisor:</strong> ${htmlResponse}`;
         chatBox.appendChild(botMessage);
         
         // Scroll to bottom
@@ -201,4 +211,24 @@ document.getElementById("chatInput").addEventListener("keypress", function(e) {
 document.addEventListener("DOMContentLoaded", function() {
     // Load analysis if available
     loadAnalysis();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Load analysis if available
+    loadAnalysis();
+
+    // Smooth Scroll Animations using IntersectionObserver
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('translate-y-0', 'opacity-100');
+                entry.target.classList.remove('translate-y-20', 'opacity-0');
+            } else {
+                entry.target.classList.remove('translate-y-0', 'opacity-100');
+                entry.target.classList.add('translate-y-20', 'opacity-0');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 });
