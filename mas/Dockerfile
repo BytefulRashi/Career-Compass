@@ -13,20 +13,21 @@ COPY requirements.txt .
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install additional required packages
-RUN pip install crewai crewai-tools pymupdf langchain-google-genai faiss-cpu boto3 langchain-groq marko
-
-# Install Streamlit
-RUN pip install streamlit
+# Install Flask and any other needed packages explicitly
+RUN pip install flask crewai crewai-tools pymupdf langchain-google-genai faiss-cpu boto3 langchain-groq marko
 
 # Copy the rest of the application code into the container
 COPY . .
 
-# Make port 8501 available to the world outside this container
-EXPOSE 8501
+# Expose the port Flask will run on (default 5000)
+EXPOSE 5000
 
-# Define environment variable
-ENV PYTHONUNBUFFERED=1
+# Define environment variable to run Flask in production mode
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
 
-# Run the application
-CMD ["streamlit", "run", "career_nexus.py"]
+# Set environment to disable debug mode in production
+ENV FLASK_ENV=production
+
+# Run the application using Flask
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000", "--extra-files", "app.py"]
