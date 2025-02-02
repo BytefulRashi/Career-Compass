@@ -77,6 +77,11 @@ pip list  # Check installed packages
 pip check  # Verify dependencies
 ```
 
+### Running the app
+```bash
+flask run --extra-files "app.py"
+```
+
 ## 🏗️ System Architecture
 
 ### Multi-Agent Analysis Orchestra
