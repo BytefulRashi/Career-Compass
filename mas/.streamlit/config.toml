@@ -1,6 +1,0 @@
-[theme]
-base="light"
-primaryColor="#ff4b4b"  # Button and accent color
-backgroundColor="#ffffff"  # Main background color
-secondaryBackgroundColor="#f0f2f6"  # Sidebar background color
-textColor="#000000"  # Text color

@@ -9,7 +9,7 @@ def upload_files_to_s3(directory, bucket_name, s3_folder='outputs/'):
     s3 = boto3.client('s3')
     
     for filename in os.listdir(directory):
-        if filename.endswith('.md'):
+        if filename.endswith('.txt'):
             local_path = os.path.join(directory, filename)
             s3_path = os.path.join(s3_folder, filename)
             

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Compass - Your Career Guide</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <span>Career Compass</span>
+            </div>
+            <nav>
+                <a href="#" class="active" id="homeLink">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="#" id="resumeLink">
+                    <i class="fas fa-file-alt"></i> Resume
+                </a>
+                <a href="#" id="chatLink">
+                    <i class="fas fa-comments"></i> Career Advisor
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header>
+                <div class="header-content">
+                    <h1>Welcome to Career Compass</h1>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Home Section -->
+                <div class="section active" id="homeSection">
+                    <div class="card">
+                        <h2>Set Your Career Goal</h2>
+                        <form id="goalForm" class="form-group">
+                            <input type="text" id="careerGoal" placeholder="Enter your career goal..." required>
+                            <button type="submit" class="btn primary">Set Goal</button>
+                        </form>
+                        <p id="goalMessage" class="message"></p>
+                    </div>
+                </div>
+
+                            <!-- Resume Section -->
+                <div class="section" id="resumeSection">
+                    <div class="card">
+                        <h2>Upload Your Resume</h2>
+                        <form id="resumeForm" class="form-group" enctype="multipart/form-data">
+                            <div class="file-upload">
+                                <input type="file" id="resume" accept=".pdf" required>
+                                <label for="resume">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Choose a PDF file</span>
+                                </label>
+                            </div>
+                            <button type="submit" class="btn primary">Upload Resume</button>
+                        </form>
+                        <p id="uploadMessage" class="message"></p>
+                    </div>
+                    
+                    <div class="card" id="analysisResults">
+                        <h2>Resume Analysis</h2>
+                        <div id="analysisContent" class="markdown-content">
+                            <!-- Analysis content will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Section -->
+                <div class="section" id="chatSection">
+                    <div class="card chat-container">
+                        <h2>Career Advisor Chat</h2>
+                        <div id="chatBox" class="chat-box"></div>
+                        <div class="chat-input">
+                            <input type="text" id="chatInput" placeholder="Ask your career-related questions...">
+                            <button onclick="sendChat()" class="btn primary">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

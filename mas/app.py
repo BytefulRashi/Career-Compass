@@ -8,6 +8,7 @@ from src.mas.crew import Mas
 from src.mas.S3 import upload_files_to_s3
 from ragS3 import RAGS3
 import io
+import markdown
 
 load_dotenv()
 
@@ -20,7 +21,7 @@ app.secret_key = os.environ.get('SECRET_KEY', generate_secret_key())
 # Configure directories
 CURRENT_DIR = Path(os.getcwd())
 BASE_DIR = CURRENT_DIR / ""
-TEXT_FILES_DIR = BASE_DIR / "processed_resumes"
+TEXT_FILES_DIR = BASE_DIR / "processed_resume"
 MD_FILES_DIR = BASE_DIR / "output"
 
 # Create directories if they don't exist
@@ -70,7 +71,7 @@ def initialize_rag():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('base.html')  # Changed to use our new base.html template
 
 @app.route('/submit_goal', methods=['POST'])
 def submit_goal():
@@ -111,12 +112,13 @@ def upload_resume():
 
             # Process with Mas
             Mas().crew().kickoff(inputs=inputs)
+            upload_files_to_s3('processed_resume', os.environ.get('BUCKET_NAME'))
             upload_files_to_s3('output', os.environ.get('BUCKET_NAME'))
             
             # Update session
             session['resume_txt_path'] = str(txt_path)
             session['processing_done'] = True
-            
+        
             return jsonify({'success': True, 'message': 'Resume processed successfully'})
             
         except Exception as e:
@@ -127,7 +129,7 @@ def upload_resume():
 @app.route('/chat', methods=['POST'])
 def chat():
     if not session.get('processing_done'):
-        return jsonify({'error': 'Please process resume first'}), 400
+        return jsonify({'error': 'Please upload and process your resume first'}), 400
         
     try:
         question = request.json.get('question')
@@ -152,31 +154,33 @@ def chat():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/get_report/<category>')
-def get_report(category):
+@app.route('/get_analysis')
+def get_analysis():
+    """Get combined analysis from all markdown files."""
     if not session.get('processing_done'):
         return jsonify({'error': 'Please process resume first'}), 400
         
-    categories = {
-        "career-guidance": "Career Guidance.md",
-        "market-analysis": "Market Analysis.md",
-        "profile-assessment": "Profile Assessment.md",
-        "skill-evaluation": "Skill Evaluation.md",
-        "bias-mitigation": "Bias Mitigated Responses.md"
-    }
-    
-    if category not in categories:
-        return jsonify({'error': 'Invalid category'}), 400
-        
     try:
-        file_path = MD_FILES_DIR / categories[category]
-        if not file_path.exists():
-            return jsonify({'error': 'Report not available yet'}), 404
+        combined_content = []
+        md_files = [
+            "Career Guidance.md",
+            "Market Analysis.md",
+            "Profile Assessment.md",
+            "Skill Evaluation.md",
+            "Bias Mitigated Responses.md"
+        ]
+        
+        for filename in md_files:
+            file_path = MD_FILES_DIR / filename
+            if file_path.exists():
+                with open(file_path, "r", encoding="utf-8") as file:
+                    content = file.read()
+                    combined_content.append(f"## {filename[:-3]}\n\n{content}\n\n")
+        
+        if not combined_content:
+            return jsonify({'error': 'No analysis available yet'}), 404
             
-        with open(file_path, "r", encoding="utf-8") as file:
-            content = file.read()
-            
-        return jsonify({'content': content})
+        return jsonify({'content': '\n'.join(combined_content)})
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500

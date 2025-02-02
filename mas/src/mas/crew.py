@@ -18,7 +18,9 @@ memory_config = {
 # you can use the @before_kickoff and @after_kickoff decorators
 # https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
 
-# llm = LLM(model="groq/llama-3.2-90b-text-preview", temperature=0.7)
+#llm1 = LLM(model="groq/llama-3.3-70b-versatile", temperature=0.7)
+
+#llm3 = LLM(model="gemini/gemini-2.0-flash-exp",temperature=0.7)
 
 # llm = LLM(model="ollama/llama3:70b", base_url="http://localhost:11434")
 
