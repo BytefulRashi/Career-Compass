@@ -1,3 +1,6 @@
+![image](https://github.com/user-attachments/assets/5d27e495-9bb1-4ec7-83df-a1e76d2b6059)
+
+
 # Career Compass: AI-Powered Career Guidance Platform
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
