@@ -1,6 +1,3 @@
-const { BUCKET_NAME } = require('./config.js');
-const { AWS_REGION } = require('./config.js');
-
 // Navigation
 document.querySelectorAll('.sidebar nav a').forEach(link => {
     link.addEventListener('click', function(e) {
@@ -123,8 +120,8 @@ function loadAnalysisContent(filename) {
     console.log('Loading analysis content for file:', filename);
 
     // S3 bucket public URL
-    const bucketName = BUCKET_NAME;  // Replace with your actual bucket name
-    const s3Region = AWS_REGION;  // Replace with your actual AWS region
+    const bucketName = process.env.BUCKET_NAME;  // Replace with your actual bucket name
+    const s3Region = process.env.AWS_REGION;  // Replace with your actual AWS region
     const s3BaseUrl = `https://${bucketName}.s3.${s3Region}.amazonaws.com/outputs/`;
 
     // Construct the full URL
