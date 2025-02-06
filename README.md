@@ -65,8 +65,15 @@ touch src/mas/.env
 
 # Add required environment variables
 # Example:
-OPENAI_API_KEY=your_key_here
-GOOGLE_API_KEY=your_key_here
+GROQ_API_KEY="your_key_here"
+EXA_API_KEY="your_key_here"
+GOOGLE_API_KEY="your_key_here"
+SAMBANOVA_API_KEY="your_key_here"
+MEM0_API_KEY="your_key_here"
+BUCKET_NAME="your_key_here"
+AWS_REGION="your_key_here"
+AWS_ACCESS_KEY_ID="your_key_here"
+AWS_SECRET_ACCESS_KEY="your_key_here"
 ```
 
 ### Verification
