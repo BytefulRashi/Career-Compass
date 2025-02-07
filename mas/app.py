@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, g
 from werkzeug.utils import secure_filename
 from pathlib import Path
+import sqlite3
 import os
 import fitz
 from dotenv import load_dotenv
@@ -8,6 +9,12 @@ from src.mas.crew import Mas
 from src.mas.S3 import upload_files_to_s3
 from ragS3 import RAGS3
 import io
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import InputRequired, Length, EqualTo
+from flask_bcrypt import Bcrypt
+
 # import markdown
 
 load_dotenv()
@@ -17,6 +24,70 @@ def generate_secret_key():
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', generate_secret_key())
+bcrypt = Bcrypt(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+DATABASE = "users.db"
+
+# Database helper functions
+def get_db():
+    """Connect to the database."""
+    if not hasattr(g, '_database'):
+        g._database = sqlite3.connect(DATABASE)
+        g._database.row_factory = sqlite3.Row
+    return g._database
+
+def init_db():
+    """Initialize the database and create the users table if not exists."""
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            username TEXT UNIQUE NOT NULL,
+                            password TEXT NOT NULL)''')
+        conn.commit()
+
+# Flask-Login User Model
+class User(UserMixin):
+    def __init__(self, id, username):
+        self.id = id
+        self.username = username
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Load user from the database."""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    user = cursor.fetchone()
+    return User(user["id"], user["username"]) if user else None
+
+# Registration Form
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=20)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm Password', validators=[InputRequired(), EqualTo('password')])
+    submit = SubmitField('Register')
+
+# Login Form
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=20)])
+    password = PasswordField('Password', validators=[InputRequired()])
+    submit = SubmitField('Login')
+
+@app.before_request
+def before_request():
+    """Ensure database connection is available before each request."""
+    get_db()
+
+@app.teardown_appcontext
+def close_connection(exception):
+    """Close the database connection at the end of the request."""
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 # Configure directories
 CURRENT_DIR = Path(os.getcwd())
@@ -70,10 +141,12 @@ def initialize_rag():
         raise Exception(f"Error initializing RAG system: {str(e)}")
 
 @app.route('/')
+@login_required
 def index():
     return render_template('base.html')  # Changed to use our new base.html template
 
 @app.route('/submit_goal', methods=['POST'])
+@login_required
 def submit_goal():
     career_goal = request.form.get('career_goal')
     if career_goal:
@@ -82,6 +155,7 @@ def submit_goal():
     return jsonify({'error': 'Career goal is required'}), 400
 
 @app.route('/upload_resume', methods=['POST'])
+@login_required
 def upload_resume():
     if 'resume' not in request.files:
         return jsonify({'error': 'No file part'}), 400
@@ -127,6 +201,7 @@ def upload_resume():
     return jsonify({'error': 'Invalid file type'}), 400
 
 @app.route('/chat', methods=['POST'])
+@login_required
 def chat():
     if not session.get('processing_done'):
         return jsonify({'error': 'Please upload and process your resume first'}), 400
@@ -155,6 +230,7 @@ def chat():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/get_analysis')
+@login_required
 def get_analysis():
     """Get combined analysis from all markdown files."""
     if not session.get('processing_done'):
@@ -190,5 +266,45 @@ def clear_session():
     session.clear()
     return jsonify({'success': True})
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        conn = get_db()
+        cursor = conn.cursor()
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        try:
+            cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (form.username.data, hashed_password))
+            conn.commit()
+            flash('Account created successfully! Please log in.', 'success')
+            return redirect(url_for('login'))
+        except sqlite3.IntegrityError:
+            flash('Username already exists.', 'danger')
+    return render_template('register.html', form=form)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE username = ?", (form.username.data,))
+        user = cursor.fetchone()
+        if user and bcrypt.check_password_hash(user["password"], form.password.data):
+            login_user(User(user["id"], user["username"]))
+            flash('Login successful!', 'success')
+            return redirect('/')
+        flash('Invalid username or password', 'danger')
+    return render_template('login.html', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Logged out successfully.', 'info')
+    return redirect(url_for('login'))
+
 if __name__ == '__main__':
+    init_db()
     app.run(debug=True)
