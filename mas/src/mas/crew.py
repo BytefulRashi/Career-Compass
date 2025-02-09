@@ -20,14 +20,14 @@ memory_config = {
 
 #llm1 = LLM(model="groq/llama-3.3-70b-versatile", temperature=0.7)
 
-#llm3 = LLM(model="gemini/gemini-2.0-flash-exp",temperature=0.7)
+# llm = LLM(model="gemini/gemini-2.0-flash-exp",temperature=0.7)
 
 # llm = LLM(model="ollama/llama3:70b", base_url="http://localhost:11434")
 
 # llm = LLM(model="huggingface/meta-llama/Meta-Llama-3.1-8B-Instruct", base_url="your_api_endpoint")
 
 llm = LLM(
-    model="sambanova/Llama-3.2-90B-Vision-Instruct",
+    model="sambanova/Meta-Llama-3.3-70B-Instruct",
     temperature=0.7
 )
 

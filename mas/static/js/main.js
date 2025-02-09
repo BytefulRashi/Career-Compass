@@ -120,9 +120,10 @@ function loadAnalysisContent(filename) {
     console.log('Loading analysis content for file:', filename);
 
     // S3 bucket public URL
-    const bucketName = process.env.BUCKET_NAME;  // Replace with your actual bucket name
-    const s3Region = process.env.AWS_REGION;  // Replace with your actual AWS region
+    const bucketName = config.BUCKET_NAME;  // Replace with your actual bucket name
+    const s3Region = config.AWS_REGION;  // Replace with your actual AWS region
     const s3BaseUrl = `https://${bucketName}.s3.${s3Region}.amazonaws.com/outputs/`;
+    console.log('S3 Base URL:', s3BaseUrl);
 
     // Construct the full URL
     const fileUrl = s3BaseUrl + encodeURIComponent(filename);

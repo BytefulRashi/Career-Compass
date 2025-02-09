@@ -19,6 +19,13 @@ from flask_bcrypt import Bcrypt
 
 load_dotenv()
 
+CURRENT_DIR = Path(os.getcwd())
+BASE_DIR = CURRENT_DIR / ""
+TEXT_FILES_DIR = BASE_DIR / "processed_resume"
+MD_FILES_DIR = BASE_DIR / "output"
+
+DATABASE = os.path.join(BASE_DIR, 'users.db')
+
 def generate_secret_key():
     return os.urandom(24).hex()
 
@@ -29,25 +36,41 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-DATABASE = "users.db"
-
 # Database helper functions
 def get_db():
-    """Connect to the database."""
+    """Get database connection."""
     if not hasattr(g, '_database'):
         g._database = sqlite3.connect(DATABASE)
         g._database.row_factory = sqlite3.Row
     return g._database
 
 def init_db():
-    """Initialize the database and create the users table if not exists."""
-    with sqlite3.connect(DATABASE) as conn:
-        cursor = conn.cursor()
-        cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            username TEXT UNIQUE NOT NULL,
-                            password TEXT NOT NULL)''')
-        conn.commit()
+    """Initialize the database and create tables if they don't exist."""
+    try:
+        # Ensure the database directory exists
+        db_path = Path(DATABASE)
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        print(f"Initializing database at: {DATABASE}")
+        
+        with sqlite3.connect(DATABASE) as conn:
+            cursor = conn.cursor()
+            
+            # Create users table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL
+                )
+            ''')
+            
+            conn.commit()
+            print("Database initialization successful")
+            
+    except Exception as e:
+        print(f"Error initializing database: {str(e)}")
+        raise
 
 # Flask-Login User Model
 class User(UserMixin):
@@ -88,12 +111,6 @@ def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
-
-# Configure directories
-CURRENT_DIR = Path(os.getcwd())
-BASE_DIR = CURRENT_DIR / ""
-TEXT_FILES_DIR = BASE_DIR / "processed_resume"
-MD_FILES_DIR = BASE_DIR / "output"
 
 # Create directories if they don't exist
 TEXT_FILES_DIR.mkdir(parents=True, exist_ok=True)
@@ -143,7 +160,9 @@ def initialize_rag():
 @app.route('/')
 @login_required
 def index():
-    return render_template('base.html')  # Changed to use our new base.html template
+    bucket_name = os.getenv('BUCKET_NAME')
+    region = os.getenv('AWS_REGION')
+    return render_template('base.html', bucket_name=bucket_name, region=region)  # Changed to use our new base.html template
 
 @app.route('/submit_goal', methods=['POST'])
 @login_required
@@ -308,3 +327,6 @@ def logout():
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
+
+with app.app_context():
+    init_db()
